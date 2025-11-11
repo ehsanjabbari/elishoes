@@ -206,7 +206,13 @@ function renderInputInvoices() {
     
     // Add event listeners
     tbody.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => editInputInvoice(btn.dataset.id));
+        console.log('Attaching edit listener to button with id:', btn.dataset.id);
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Edit button clicked for invoice:', btn.dataset.id);
+            editInputInvoice(btn.dataset.id);
+        });
     });
     
     tbody.querySelectorAll('.delete-btn').forEach(btn => {
@@ -222,7 +228,8 @@ function addInputInvoice() {
 }
 
 function editInputInvoice(id) {
-    showInvoiceModal('edit', id);
+    console.log('editInputInvoice called with id:', id);
+    showInvoiceModal('edit', id, 'input');
 }
 
 function deleteInputInvoice(id) {
@@ -271,7 +278,13 @@ function renderSales151() {
     
     // Add event listeners
     tbody.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => editSale151(btn.dataset.id));
+        console.log('Attaching edit listener to button with id:', btn.dataset.id);
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Edit button clicked for sale 151:', btn.dataset.id);
+            editSale151(btn.dataset.id);
+        });
     });
     
     tbody.querySelectorAll('.delete-btn').forEach(btn => {
@@ -314,7 +327,13 @@ function renderSales168() {
     
     // Add event listeners
     tbody.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => editSale168(btn.dataset.id));
+        console.log('Attaching edit listener to button with id:', btn.dataset.id);
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Edit button clicked for sale 168:', btn.dataset.id);
+            editSale168(btn.dataset.id);
+        });
     });
     
     tbody.querySelectorAll('.delete-btn').forEach(btn => {
@@ -330,6 +349,7 @@ function addSale151() {
 }
 
 function editSale151(id) {
+    console.log('editSale151 called with id:', id);
     showInvoiceModal('edit', id, 'sales-151');
 }
 
@@ -351,6 +371,7 @@ function addSale168() {
 }
 
 function editSale168(id) {
+    console.log('editSale168 called with id:', id);
     showInvoiceModal('edit', id, 'sales-168');
 }
 
@@ -418,6 +439,8 @@ function renderInventory() {
 
 // Modal Management
 function showInvoiceModal(action, id, type = 'input') {
+    console.log('showInvoiceModal called with:', { action, id, type });
+    
     const modal = document.getElementById('invoice-modal');
     const title = document.getElementById('invoice-modal-title');
     const dateInput = document.getElementById('invoice-date');
@@ -432,13 +455,53 @@ function showInvoiceModal(action, id, type = 'input') {
         title.textContent = action === 'add' ? 'افزودن فاکتور ورودی' : 'ویرایش فاکتور ورودی';
     }
     
-    // Clear products container and add one row
-    productsContainer.innerHTML = '<div class="product-row"></div>';
-    addProductRow(productsContainer.querySelector('.product-row'));
+    if (action === 'edit' && id) {
+        console.log('Loading existing invoice for edit');
+        
+        // Load existing invoice data for editing
+        let invoice;
+        if (type === 'sales-151') {
+            invoice = appState.sales151.find(s => s.id === id);
+        } else if (type === 'sales-168') {
+            invoice = appState.sales168.find(s => s.id === id);
+        } else {
+            invoice = appState.inputInvoices.find(i => i.id === id);
+        }
+        
+        console.log('Found invoice:', invoice);
+        
+        if (invoice) {
+            // Set the date
+            dateInput.value = invoice.date;
+            
+            // Clear products container
+            productsContainer.innerHTML = '';
+            
+            // Add product rows based on existing invoice items
+            invoice.items.forEach((item, index) => {
+                console.log('Adding product row:', item);
+                const rowElement = document.createElement('div');
+                rowElement.className = 'product-row';
+                productsContainer.appendChild(rowElement);
+                addProductRow(rowElement, item.productId, item.quantity);
+            });
+        } else {
+            console.log('Invoice not found, falling back to add mode');
+            // Fallback to add mode if invoice not found
+            action = 'add';
+        }
+    }
     
-    // Set date to today (1404)
-    const today = new Date('2024-10-27'); // 1404/08/06 equivalent
-    dateInput.value = formatDateToPersian(today);
+    if (action === 'add') {
+        console.log('Creating new invoice');
+        // Clear products container and add one row for new invoice
+        productsContainer.innerHTML = '<div class="product-row"></div>';
+        addProductRow(productsContainer.querySelector('.product-row'));
+        
+        // Set date to today (1404)
+        const today = new Date('2024-10-27'); // 1404/08/06 equivalent
+        dateInput.value = formatDateToPersian(today);
+    }
     
     // Set modal data
     modal.dataset.action = action;
@@ -446,9 +509,17 @@ function showInvoiceModal(action, id, type = 'input') {
     modal.dataset.type = type;
     modal.classList.add('active');
     dateInput.focus();
+    
+    console.log('Modal opened with data:', {
+        action: modal.dataset.action,
+        id: modal.dataset.id,
+        type: modal.dataset.type
+    });
 }
 
-function addProductRow(rowElement) {
+function addProductRow(rowElement, selectedProductId = '', quantity = '') {
+    console.log('addProductRow called with:', { selectedProductId, quantity });
+    
     if (!rowElement) {
         const container = document.getElementById('invoice-products');
         rowElement = document.createElement('div');
@@ -464,6 +535,10 @@ function addProductRow(rowElement) {
         const option = document.createElement('option');
         option.value = product.id;
         option.textContent = product.name;
+        if (selectedProductId && selectedProductId === product.id) {
+            option.selected = true;
+            console.log('Selected product:', product.name);
+        }
         select.appendChild(option);
     });
     
@@ -473,6 +548,10 @@ function addProductRow(rowElement) {
     input.className = 'product-quantity';
     input.placeholder = 'تعداد';
     input.min = '1';
+    if (quantity) {
+        input.value = quantity;
+        console.log('Set quantity:', quantity);
+    }
     
     // Create remove button
     const removeBtn = document.createElement('button');
@@ -486,13 +565,18 @@ function addProductRow(rowElement) {
         }
     });
     
+    // Clear and append elements
     rowElement.innerHTML = '';
     rowElement.appendChild(select);
     rowElement.appendChild(input);
     rowElement.appendChild(removeBtn);
     
-    // Refresh icons
-    lucide.createIcons();
+    // Refresh icons with delay
+    setTimeout(() => {
+        lucide.createIcons();
+    }, 50);
+    
+    console.log('Product row added successfully');
 }
 
 // Modal Event Handlers
@@ -561,7 +645,17 @@ function initializeModalHandlers() {
     
     // Add product row button
     document.getElementById('add-product-row').addEventListener('click', () => {
-        addProductRow();
+        addProductRow(null, '', '');
+    });
+    
+    // Add close button event listeners to modals
+    document.querySelectorAll('.close-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const modal = btn.closest('.modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        });
     });
     
     // Confirm Modal
