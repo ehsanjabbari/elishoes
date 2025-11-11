@@ -396,8 +396,11 @@ function renderInventory() {
     const tbody = document.querySelector('#inventory-table tbody');
     tbody.innerHTML = '';
     
+    // مرتب‌سازی محصولات بر اساس نام
+    const sortedProducts = [...appState.products].sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+    
     // Calculate inventory for each product
-    const inventory = appState.products.map(product => {
+    const inventory = sortedProducts.map(product => {
         // Calculate total input
         const totalInput = appState.inputInvoices.reduce((sum, invoice) => {
             const item = invoice.items.find(i => i.productId === product.id);
