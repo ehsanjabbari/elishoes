@@ -1,15 +1,15 @@
 // Service Worker for elishoes PWA
-const CACHE_NAME = 'elishoes-v1.0.1';
+const CACHE_NAME = 'elishoes-v1.0.0';
 const urlsToCache = [
-  '/elishoes/',
-  '/elishoes/index.html',
-  '/elishoes/style.css',
-  '/elishoes/script.js',
-  '/elishoes/manifest.json',
-  '/elishoes/icons/icon-192x192.png',
-  '/elishoes/icons/icon-512x512.png',
-  '/elishoes/icons/apple-touch-icon-120x120.png',
-  '/elishoes/icons/apple-touch-icon-180x180.png',
+  '/',
+  '/index.html',
+  '/style.css',
+  '/script.js',
+  '/manifest.json',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/icons/apple-touch-icon-120x120.png',
+  '/icons/apple-touch-icon-180x180.png',
   'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap',
   'https://fonts.gstatic.com/s/vazirmatn/v12/Xr9dH3U37Xxhe2q6Uk5v3kaVUhZy.woff2',
   'https://unpkg.com/lucide@latest/dist/umd/lucide.js'

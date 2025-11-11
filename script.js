@@ -87,7 +87,10 @@ function renderProducts() {
     const tbody = document.querySelector('#products-table tbody');
     tbody.innerHTML = '';
     
-    appState.products.forEach(product => {
+    // مرتب‌سازی محصولات بر اساس نام
+    const sortedProducts = [...appState.products].sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+    
+    sortedProducts.forEach(product => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${product.name}</td>
@@ -531,7 +534,10 @@ function addProductRow(rowElement, selectedProductId = '', quantity = '') {
     const select = document.createElement('select');
     select.className = 'product-select';
     select.innerHTML = '<option value="">انتخاب محصول</option>';
-    appState.products.forEach(product => {
+    
+    // مرتب‌سازی محصولات بر اساس نام
+    const sortedProducts = [...appState.products].sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+    sortedProducts.forEach(product => {
         const option = document.createElement('option');
         option.value = product.id;
         option.textContent = product.name;
@@ -849,7 +855,10 @@ function refreshProductSelects() {
     selects.forEach(select => {
         const currentValue = select.value;
         select.innerHTML = '<option value="">انتخاب محصول</option>';
-        appState.products.forEach(product => {
+        
+        // مرتب‌سازی محصولات بر اساس نام
+        const sortedProducts = [...appState.products].sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+        sortedProducts.forEach(product => {
             const option = document.createElement('option');
             option.value = product.id;
             option.textContent = product.name;
